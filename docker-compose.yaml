@@ -1,0 +1,15 @@
+version: "3.7"
+
+services:
+  ssh-dev:
+    image: golang:1.17.2
+    hostname: ssh-dev
+    container_name: ssh-dev
+    volumes:
+      - "./:/home/ssh:rw"
+    working_dir: "/home/ssh"
+    network_mode: "host"
+    environment:
+      - GOFLAGS=-gcflags=-G=3
+    command: /bin/sh -c "while :; do sleep 10; done"
+

@@ -1,0 +1,11 @@
+{
+    "recommendations": [
+        "golang.go",
+        "premparihar.gotestexplorer",
+        "mhutchie.git-graph",
+        "eamodio.gitlens",
+        "coenraads.bracket-pair-colorizer-2",
+        "oderwat.indent-rainbow",
+        "hediet.vscode-drawio"
+    ]
+}
