@@ -1,12 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
 	"golang.org/x/crypto/ssh"
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 type params struct {
@@ -42,6 +41,10 @@ func init() {
 	rootCmd.Flags().StringVarP(&params.password, "password", "P", params.password, "")
 
 	rootCmd.RunE = func(cmd *cobra.Command, args []string) error {
+		if params.host == "" || params.user == "" {
+			return rootCmd.Help()
+		}
+
 		// Create sshClientConfig
 		sshConfig := &ssh.ClientConfig{
 			User: params.user,
@@ -66,16 +69,16 @@ func init() {
 
 		// キー入力を接続先が認識できる形式に変換する(ここがキモ)
 		fd := int(os.Stdin.Fd())
-		state, err := terminal.MakeRaw(fd)
+		state, err := term.MakeRaw(fd)
 		if err != nil {
-			fmt.Println(err)
+			return err
 		}
-		defer terminal.Restore(fd, state)
+		defer term.Restore(fd, state)
 
 		// ターミナルサイズの取得
-		w, h, err := terminal.GetSize(fd)
+		w, h, err := term.GetSize(fd)
 		if err != nil {
-			fmt.Println(err)
+			return err
 		}
 
 		modes := ssh.TerminalModes{
@@ -84,23 +87,20 @@ func init() {
 			ssh.TTY_OP_OSPEED: 14400,
 		}
 
-		err = session.RequestPty("xterm", h, w, modes)
-		if err != nil {
-			fmt.Println(err)
+		if err := session.RequestPty("xterm", h, w, modes); err != nil {
+			return err
 		}
 
 		session.Stdout = os.Stdout
 		session.Stderr = os.Stderr
 		session.Stdin = os.Stdin
 
-		err = session.Shell()
-		if err != nil {
-			fmt.Println(err)
+		if err := session.Shell(); err != nil {
+			return err
 		}
 
-		err = session.Wait()
-		if err != nil {
-			fmt.Println(err)
+		if err := session.Wait(); err != nil {
+			return err
 		}
 
 		return nil
