@@ -2,30 +2,36 @@ package ssh
 
 import (
 	"os"
+	"runtime"
 
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/term"
 )
 
 func interactiveShellCalling(session *ssh.Session) error {
-	fd := int(os.Stdin.Fd())
-	state, err := term.MakeRaw(fd)
-	if err != nil {
-		return err
-	}
-	defer term.Restore(fd, state)
-
-	w, h, err := term.GetSize(fd)
-	if err != nil {
-		return err
-	}
-
 	modes := ssh.TerminalModes{
 		ssh.ECHO:          1,
 		ssh.TTY_OP_ISPEED: 14400,
 		ssh.TTY_OP_OSPEED: 14400,
 	}
 
+	var w, h int
+	switch runtime.GOOS {
+
+	case "windows":
+		w, h = 1000, 1000
+	case "linux":
+		fd := int(os.Stdin.Fd())
+		state, err := term.MakeRaw(fd)
+		if err != nil {
+			return err
+		}
+		defer term.Restore(fd, state)
+		w, h, err = term.GetSize(fd)
+		if err != nil {
+			return err
+		}
+	}
 	if err := session.RequestPty("xterm", h, w, modes); err != nil {
 		return err
 	}

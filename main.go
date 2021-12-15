@@ -38,6 +38,7 @@ func init() {
 	rootCmd.Use = "ssh"
 	rootCmd.Short = "ssh command test"
 	rootCmd.Version = "0.1"
+	rootCmd.SilenceUsage = true
 	rootCmd.Flags().StringVarP(&params.host, "host", "H", params.host, "")
 	rootCmd.Flags().StringVarP(&params.port, "port", "p", params.port, "")
 	rootCmd.Flags().StringVarP(&params.user, "user", "u", params.user, "")
