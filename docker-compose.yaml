@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   ssh-dev:
-    image: golang:1.17.2
+    image: golang:1.17.5
     hostname: ssh-dev
     container_name: ssh-dev
     volumes:
