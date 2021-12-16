@@ -14,6 +14,7 @@ type params struct {
 	password   string
 	publicKey  string
 	command    string
+	multiHost  []string
 }
 
 var rootCmd = &cobra.Command{}
@@ -33,6 +34,7 @@ func init() {
 		password:   "",
 		publicKey:  "",
 		command:    "",
+		multiHost:  []string{},
 	}
 
 	rootCmd.Use = "ssh"
@@ -45,6 +47,7 @@ func init() {
 	rootCmd.Flags().StringVarP(&params.password, "password", "P", params.password, "")
 	rootCmd.Flags().StringVarP(&params.publicKey, "identity-file", "i", params.publicKey, "")
 	rootCmd.Flags().StringVarP(&params.command, "command", "c", params.command, "")
+	rootCmd.Flags().StringArrayVarP(&params.multiHost, "multi-host", "s", params.multiHost, "")
 
 	rootCmd.RunE = func(cmd *cobra.Command, args []string) error {
 		if params.singleHost == "" || params.user == "" {
