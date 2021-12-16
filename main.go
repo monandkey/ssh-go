@@ -8,12 +8,12 @@ import (
 )
 
 type params struct {
-	host      string
-	port      string
-	user      string
-	password  string
-	publicKey string
-	command   string
+	singleHost string
+	port       string
+	user       string
+	password   string
+	publicKey  string
+	command    string
 }
 
 var rootCmd = &cobra.Command{}
@@ -27,19 +27,19 @@ func Execute() {
 
 func init() {
 	params := params{
-		host:      "",
-		port:      "22",
-		user:      "",
-		password:  "",
-		publicKey: "",
-		command:   "",
+		singleHost: "",
+		port:       "22",
+		user:       "",
+		password:   "",
+		publicKey:  "",
+		command:    "",
 	}
 
 	rootCmd.Use = "ssh"
 	rootCmd.Short = "ssh command test"
 	rootCmd.Version = "0.1"
 	rootCmd.SilenceUsage = true
-	rootCmd.Flags().StringVarP(&params.host, "host", "H", params.host, "")
+	rootCmd.Flags().StringVarP(&params.singleHost, "single-host", "s", params.singleHost, "")
 	rootCmd.Flags().StringVarP(&params.port, "port", "p", params.port, "")
 	rootCmd.Flags().StringVarP(&params.user, "user", "u", params.user, "")
 	rootCmd.Flags().StringVarP(&params.password, "password", "P", params.password, "")
@@ -47,13 +47,13 @@ func init() {
 	rootCmd.Flags().StringVarP(&params.command, "command", "c", params.command, "")
 
 	rootCmd.RunE = func(cmd *cobra.Command, args []string) error {
-		if params.host == "" || params.user == "" {
+		if params.singleHost == "" || params.user == "" {
 			return rootCmd.Help()
 		}
 
 		actour := ssh.SshStrct()
 		actour.Set(
-			params.host,
+			params.singleHost,
 			params.port,
 			params.user,
 			params.password,
