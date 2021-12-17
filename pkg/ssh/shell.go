@@ -57,7 +57,3 @@ func nonInteractiveShellCalling(session *ssh.Session, command string) error {
 	}
 	return nil
 }
-
-// func commandToSingleEquipment() {}
-
-// func commandToMultipleEquipment() {}
