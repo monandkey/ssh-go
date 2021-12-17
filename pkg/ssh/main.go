@@ -4,19 +4,24 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-func SshStrct() SshMethod {
-	return &sshConfig{}
+func SshStrct(singleHost string) SshMethod {
+	if singleHost == "" {
+		return multiNodeStruct()
+	}
+	return singleNodeStruct()
 }
 
 func (s *sshConfig) Set(
-	host string,
+	singleHost string,
+	multiHost []string,
 	port string,
 	user string,
 	password string,
 	publicKey string,
 	command string,
 ) {
-	s.host = host
+	s.singleHost = singleHost
+	s.multiHost = multiHost
 	s.port = port
 	s.user = user
 	s.password = password
@@ -31,22 +36,26 @@ func (s *sshConfig) Authentication() (*ssh.ClientConfig, error) {
 	return sshPasswordAuthorization(s.user, s.password)
 }
 
-func (s *sshConfig) Connect(sshConfig *ssh.ClientConfig) (*ssh.Session, error) {
-	session, err := createSshSession(s.host, s.port, sshConfig)
+func (s *sshConfig) Connect(sshConfig *ssh.ClientConfig) ([]*ssh.Session, error) {
+	var sessions []*ssh.Session
+	session, err := createSshSession(s.singleHost, s.port, sshConfig)
 	if err != nil {
-		return session, err
+		return sessions, err
 	}
-	return session, nil
+	sessions = append(sessions, session)
+	return sessions, nil
 }
 
-func (s *sshConfig) Run(session *ssh.Session) error {
-	if s.command == "" {
-		if err := interactiveShellCalling(session); err != nil {
-			return err
-		}
-	} else {
-		if err := nonInteractiveShellCalling(session, s.command); err != nil {
-			return err
+func (s *sshConfig) Run(sessions []*ssh.Session) error {
+	for _, session := range sessions {
+		if s.command == "" {
+			if err := interactiveShellCalling(session); err != nil {
+				return err
+			}
+		} else {
+			if err := nonInteractiveShellCalling(session, s.command); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
