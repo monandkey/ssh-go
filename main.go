@@ -9,12 +9,12 @@ import (
 
 type params struct {
 	singleHost string
+	multiHost  []string
 	port       string
 	user       string
 	password   string
 	publicKey  string
 	command    string
-	multiHost  []string
 }
 
 var rootCmd = &cobra.Command{}
@@ -29,12 +29,12 @@ func Execute() {
 func init() {
 	params := params{
 		singleHost: "",
+		multiHost:  []string{},
 		port:       "22",
 		user:       "",
 		password:   "",
 		publicKey:  "",
 		command:    "",
-		multiHost:  []string{},
 	}
 
 	rootCmd.Use = "ssh"
@@ -42,21 +42,22 @@ func init() {
 	rootCmd.Version = "0.1"
 	rootCmd.SilenceUsage = true
 	rootCmd.Flags().StringVarP(&params.singleHost, "single-host", "s", params.singleHost, "")
+	rootCmd.Flags().StringArrayVarP(&params.multiHost, "multi-host", "m", params.multiHost, "")
 	rootCmd.Flags().StringVarP(&params.port, "port", "p", params.port, "")
 	rootCmd.Flags().StringVarP(&params.user, "user", "u", params.user, "")
 	rootCmd.Flags().StringVarP(&params.password, "password", "P", params.password, "")
 	rootCmd.Flags().StringVarP(&params.publicKey, "identity-file", "i", params.publicKey, "")
 	rootCmd.Flags().StringVarP(&params.command, "command", "c", params.command, "")
-	rootCmd.Flags().StringArrayVarP(&params.multiHost, "multi-host", "s", params.multiHost, "")
 
 	rootCmd.RunE = func(cmd *cobra.Command, args []string) error {
-		if params.singleHost == "" || params.user == "" {
+		if (params.singleHost == "" || len(params.multiHost) == 0) && params.user == "" {
 			return rootCmd.Help()
 		}
 
-		actour := ssh.SshStrct()
+		actour := ssh.SshStrct(params.singleHost)
 		actour.Set(
 			params.singleHost,
+			params.multiHost,
 			params.port,
 			params.user,
 			params.password,
@@ -69,13 +70,16 @@ func init() {
 			return err
 		}
 
-		session, err := actour.Connect(config)
+		sessions, err := actour.Connect(config)
 		if err != nil {
 			return err
 		}
-		defer session.Close()
 
-		if err := actour.Run(session); err != nil {
+		for _, session := range sessions {
+			defer session.Close()
+		}
+
+		if err := actour.Run(sessions); err != nil {
 			return err
 		}
 
