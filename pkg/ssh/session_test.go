@@ -39,6 +39,21 @@ func Test_createSshSession(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "Failure Test",
+			args: args{
+				host: host,
+				port: "22",
+				sshConfig: &ssh.ClientConfig{
+					User: userName,
+					Auth: []ssh.AuthMethod{
+						ssh.Password("testtest"),
+					},
+					HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+				},
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
