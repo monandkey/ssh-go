@@ -1,6 +1,7 @@
 package ssh
 
 import (
+	"github.com/monandkey/ssh/pkg/log"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -47,13 +48,16 @@ func (s *sshConfig) Connect(sshConfig *ssh.ClientConfig) ([]*ssh.Session, error)
 }
 
 func (s *sshConfig) Run(sessions []*ssh.Session) error {
+	loggerFactory := log.NewLoggerFactory()
+
 	for _, session := range sessions {
 		if s.command == "" {
 			if err := interactiveShellCalling(session); err != nil {
 				return err
 			}
 		} else {
-			if err := nonInteractiveShellCalling(session, s.command); err != nil {
+			logger := loggerFactory.NewLogger(s.singleHost)
+			if err := nonInteractiveShellCalling(session, s.command, logger); err != nil {
 				return err
 			}
 		}
