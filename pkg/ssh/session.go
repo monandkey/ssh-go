@@ -4,6 +4,7 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
+// createSshSession is a function to create an ssh.session.
 func createSshSession(
 	host string,
 	port string,
