@@ -15,23 +15,25 @@ func interactiveShellCalling(session *ssh.Session) error {
 		ssh.TTY_OP_OSPEED: 14400,
 	}
 
-	var w, h int
-	switch runtime.GOOS {
+	fd := int(os.Stdin.Fd())
+	state, err := term.MakeRaw(fd)
+	if err != nil {
+		return err
+	}
+	defer term.Restore(fd, state)
 
+	var w, h int
+	w, h, err = term.GetSize(fd)
+
+	switch runtime.GOOS {
 	case "windows":
-		w, h = 1000, 1000
+		w, h = 200, 50
 	case "linux":
-		fd := int(os.Stdin.Fd())
-		state, err := term.MakeRaw(fd)
-		if err != nil {
-			return err
-		}
-		defer term.Restore(fd, state)
-		w, h, err = term.GetSize(fd)
 		if err != nil {
 			return err
 		}
 	}
+
 	if err := session.RequestPty("xterm", h, w, modes); err != nil {
 		return err
 	}
