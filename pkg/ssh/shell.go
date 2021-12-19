@@ -8,6 +8,7 @@ import (
 	"golang.org/x/term"
 )
 
+// interactiveShellCalling is a function for interactive shells.
 func interactiveShellCalling(session *ssh.Session) error {
 	modes := ssh.TerminalModes{
 		ssh.ECHO:          1,
@@ -50,6 +51,7 @@ func interactiveShellCalling(session *ssh.Session) error {
 	return nil
 }
 
+// nonInteractiveShellCalling is a function for non-interactive shells.
 func nonInteractiveShellCalling(session *ssh.Session, command string) error {
 	session.Stdout = os.Stdout
 	if err := session.Run(command); err != nil {
