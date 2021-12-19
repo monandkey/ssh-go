@@ -6,6 +6,7 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
+// sshPasswordAuthorization is a function to create a configuration for password authentication.
 func sshPasswordAuthorization(userName string, password string) (*ssh.ClientConfig, error) {
 	config := &ssh.ClientConfig{
 		User: userName,
@@ -17,6 +18,7 @@ func sshPasswordAuthorization(userName string, password string) (*ssh.ClientConf
 	return config, nil
 }
 
+// sshPublicKeyAuthorization is a function for creating a configuration for public key authentication.
 func sshPublicKeyAuthorization(userName string, publicKey string, passphrase string) (*ssh.ClientConfig, error) {
 	var sshconfig *ssh.ClientConfig
 	buf, err := ioutil.ReadFile(publicKey)
@@ -44,6 +46,7 @@ func sshPublicKeyAuthorization(userName string, publicKey string, passphrase str
 	return config, nil
 }
 
+// sshPublicKeyAuthorizationWithPassphrase is a function to create a configuration for public key authentication with a passphrase.
 func sshPublicKeyAuthorizationWithPassphrase(buf []byte, passphrase []byte) (ssh.Signer, error) {
 	var signer ssh.Signer
 	signer, err := ssh.ParsePrivateKeyWithPassphrase(buf, passphrase)
