@@ -1,9 +1,13 @@
 package ssh
 
 import (
+	"bytes"
 	"os"
+	"regexp"
 	"runtime"
+	"strings"
 
+	"github.com/monandkey/ssh/pkg/log"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/term"
 )
@@ -54,10 +58,19 @@ func interactiveShellCalling(session *ssh.Session) error {
 }
 
 // nonInteractiveShellCalling is a function for non-interactive shells.
-func nonInteractiveShellCalling(session *ssh.Session, command string) error {
-	session.Stdout = os.Stdout
+func nonInteractiveShellCalling(session *ssh.Session, command string, logger *log.Logger) error {
+	var b bytes.Buffer
+	session.Stdout = &b
+
 	if err := session.Run(command); err != nil {
 		return err
+	}
+
+	for _, s := range strings.Split(b.String(), "\n") {
+		if regexp.MustCompile(`^$`).MatchString(s) {
+			continue
+		}
+		logger.Println(s)
 	}
 	return nil
 }
