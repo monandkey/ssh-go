@@ -31,7 +31,7 @@ func (s *sshConfig) Set(
 
 func (s *sshConfig) Authentication() (*ssh.ClientConfig, error) {
 	if s.password == "" {
-		return sshPublicKeyAuthorization(s.user, s.publicKey)
+		return sshPublicKeyAuthorization(s.user, s.publicKey, s.password)
 	}
 	return sshPasswordAuthorization(s.user, s.password)
 }
