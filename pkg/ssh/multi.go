@@ -12,11 +12,33 @@ func multiNodeStruct() SshMethod {
 	return &multiNode{}
 }
 
+// Authentication is a function used to create a configuration for authentication.
+func (m *multiNode) Authentication() ([]*ssh.ClientConfig, error) {
+	var clientConfig []*ssh.ClientConfig
+
+	for i := 0; i < len(m.host); i++ {
+		if m.publicKey[i] != "" {
+			cfg, err := sshPublicKeyAuthorization(m.user[i], m.publicKey[i], m.password[i])
+			if err != nil {
+				return clientConfig, err
+			}
+			clientConfig = append(clientConfig, cfg)
+		} else {
+			cfg, err := sshPasswordAuthorization(m.user[i], m.password[i])
+			if err != nil {
+				return clientConfig, err
+			}
+			clientConfig = append(clientConfig, cfg)
+		}
+	}
+	return clientConfig, nil
+}
+
 // Connect is a function for creating multiple sessions.
 func (m *multiNode) Connect(sshConfig []*ssh.ClientConfig) ([]*ssh.Session, error) {
 	var sessions []*ssh.Session
-	for _, host := range m.host {
-		session, err := createSshSession(host, m.port[0], sshConfig[0])
+	for i := 0; i < len(m.host); i++ {
+		session, err := createSshSession(m.host[i], m.port[i], sshConfig[i])
 		if err != nil {
 			return sessions, err
 		}
