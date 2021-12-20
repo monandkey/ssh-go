@@ -46,9 +46,7 @@ func Test_nonInteractiveShellCalling(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := nonInteractiveShellCalling(tt.args.session, tt.args.command, logger); (err != nil) != tt.wantErr {
-				t.Errorf("nonInteractiveShellCalling() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			nonInteractiveShellCalling(tt.args.session, tt.args.command, logger)
 		})
 	}
 }

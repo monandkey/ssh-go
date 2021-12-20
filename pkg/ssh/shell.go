@@ -58,19 +58,29 @@ func interactiveShellCalling(session *ssh.Session) error {
 }
 
 // nonInteractiveShellCalling is a function for non-interactive shells.
-func nonInteractiveShellCalling(session *ssh.Session, command string, logger *log.Logger) error {
-	var b bytes.Buffer
-	session.Stdout = &b
+func nonInteractiveShellCalling(session *ssh.Session, command string, logger *log.Logger) {
+	var (
+		stdout bytes.Buffer
+		stderr bytes.Buffer
+	)
+
+	session.Stdout = &stdout
+	session.Stderr = &stderr
 
 	if err := session.Run(command); err != nil {
-		return err
+		for _, e := range strings.Split(stderr.String(), "\n") {
+			if regexp.MustCompile(`^$`).MatchString(e) {
+				continue
+			}
+			logger.Println(e)
+		}
+		return
 	}
 
-	for _, s := range strings.Split(b.String(), "\n") {
+	for _, s := range strings.Split(stdout.String(), "\n") {
 		if regexp.MustCompile(`^$`).MatchString(s) {
 			continue
 		}
 		logger.Println(s)
 	}
-	return nil
 }

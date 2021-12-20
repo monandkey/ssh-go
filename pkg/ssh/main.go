@@ -57,9 +57,7 @@ func (s *sshConfig) Run(sessions []*ssh.Session) error {
 			}
 		} else {
 			logger := loggerFactory.NewLogger(s.singleHost)
-			if err := nonInteractiveShellCalling(session, s.command, logger); err != nil {
-				return err
-			}
+			nonInteractiveShellCalling(session, s.command, logger)
 		}
 	}
 	return nil
