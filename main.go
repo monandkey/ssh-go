@@ -58,11 +58,22 @@ func init() {
 			return array
 		}
 
+		addDiff := func(array, comparison []string, inStr string) []string {
+			if len(array) == len(comparison) {
+				return array
+			}
+
+			for i := len(array); i < len(comparison); i++ {
+				array = append(array, inStr)
+			}
+			return array
+		}
+
 		params.host = add(params.host, "")
-		params.port = add(params.port, "22")
+		params.port = addDiff(params.port, params.host, "22")
 		params.user = add(params.user, "")
 		params.password = add(params.password, "")
-		params.publicKey = add(params.publicKey, "")
+		params.publicKey = addDiff(params.publicKey, params.host, "")
 
 		actour := ssh.SshStrct(params.host)
 		actour.Set(
