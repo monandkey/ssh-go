@@ -13,10 +13,10 @@ func multiNodeStruct() SshMethod {
 }
 
 // Connect is a function for creating multiple sessions.
-func (m *multiNode) Connect(sshConfig *ssh.ClientConfig) ([]*ssh.Session, error) {
+func (m *multiNode) Connect(sshConfig []*ssh.ClientConfig) ([]*ssh.Session, error) {
 	var sessions []*ssh.Session
-	for _, host := range m.multiHost {
-		session, err := createSshSession(host, m.port, sshConfig)
+	for _, host := range m.host {
+		session, err := createSshSession(host, m.port[0], sshConfig[0])
 		if err != nil {
 			return sessions, err
 		}
@@ -32,7 +32,7 @@ func (m *multiNode) Run(sessions []*ssh.Session) error {
 
 	for _, session := range sessions {
 		if m.command != "" {
-			logger := loggerFactory.NewLogger(m.multiHost[cnt])
+			logger := loggerFactory.NewLogger(m.host[cnt])
 			nonInteractiveShellCalling(session, m.command, logger)
 		} else {
 			return errors.New("please specify the command")

@@ -4,21 +4,20 @@ import "golang.org/x/crypto/ssh"
 
 //	SshMethod is a method that summarizes the steps to make an ssh connection.
 type SshMethod interface {
-	Set(string, []string, string, string, string, string, string)
-	Authentication() (*ssh.ClientConfig, error)
-	Connect(*ssh.ClientConfig) ([]*ssh.Session, error)
+	Set([]string, []string, []string, []string, []string, string)
+	Authentication() ([]*ssh.ClientConfig, error)
+	Connect([]*ssh.ClientConfig) ([]*ssh.Session, error)
 	Run([]*ssh.Session) error
 }
 
 // sshConfig is a structure that manages the parameters required for an ssh connection.
 type sshConfig struct {
-	singleHost string
-	multiHost  []string
-	port       string
-	user       string
-	password   string
-	publicKey  string
-	command    string
+	host      []string
+	port      []string
+	user      []string
+	password  []string
+	publicKey []string
+	command   string
 }
 
 // singleNode is a structure for defining methods for a single node

@@ -8,13 +8,12 @@ import (
 )
 
 type params struct {
-	singleHost string
-	multiHost  []string
-	port       string
-	user       string
-	password   string
-	publicKey  string
-	command    string
+	host      []string
+	port      []string
+	user      []string
+	password  []string
+	publicKey []string
+	command   string
 }
 
 var rootCmd = &cobra.Command{}
@@ -28,36 +27,46 @@ func Execute() {
 
 func init() {
 	params := params{
-		singleHost: "",
-		multiHost:  []string{},
-		port:       "22",
-		user:       "",
-		password:   "",
-		publicKey:  "",
-		command:    "",
+		host:      []string{},
+		port:      []string{},
+		user:      []string{},
+		password:  []string{},
+		publicKey: []string{},
+		command:   "",
 	}
 
 	rootCmd.Use = "ssh"
 	rootCmd.Short = "ssh command test"
 	rootCmd.Version = "0.1"
 	rootCmd.SilenceUsage = true
-	rootCmd.Flags().StringVarP(&params.singleHost, "single-host", "s", params.singleHost, "")
-	rootCmd.Flags().StringArrayVarP(&params.multiHost, "multi-host", "m", params.multiHost, "")
-	rootCmd.Flags().StringVarP(&params.port, "port", "p", params.port, "")
-	rootCmd.Flags().StringVarP(&params.user, "user", "u", params.user, "")
-	rootCmd.Flags().StringVarP(&params.password, "password", "P", params.password, "")
-	rootCmd.Flags().StringVarP(&params.publicKey, "identity-file", "i", params.publicKey, "")
+	rootCmd.Flags().StringArrayVarP(&params.host, "host", "H", params.host, "")
+	rootCmd.Flags().StringArrayVarP(&params.port, "port", "p", params.port, "")
+	rootCmd.Flags().StringArrayVarP(&params.user, "user", "u", params.user, "")
+	rootCmd.Flags().StringArrayVarP(&params.password, "password", "P", params.password, "")
+	rootCmd.Flags().StringArrayVarP(&params.publicKey, "identity-file", "i", params.publicKey, "")
 	rootCmd.Flags().StringVarP(&params.command, "command", "c", params.command, "")
 
 	rootCmd.RunE = func(cmd *cobra.Command, args []string) error {
-		if (params.singleHost == "" || len(params.multiHost) == 0) && params.user == "" {
+		if len(params.host) == 0 && len(params.user) == 0 {
 			return rootCmd.Help()
 		}
 
-		actour := ssh.SshStrct(params.singleHost)
+		add := func(array []string, inStr string) []string {
+			if len(array) == 0 {
+				array = append(array, inStr)
+			}
+			return array
+		}
+
+		params.host = add(params.host, "")
+		params.port = add(params.port, "22")
+		params.user = add(params.user, "")
+		params.password = add(params.password, "")
+		params.publicKey = add(params.publicKey, "")
+
+		actour := ssh.SshStrct(params.host)
 		actour.Set(
-			params.singleHost,
-			params.multiHost,
+			params.host,
 			params.port,
 			params.user,
 			params.password,
@@ -82,7 +91,6 @@ func init() {
 		if err := actour.Run(sessions); err != nil {
 			return err
 		}
-
 		return nil
 	}
 }
