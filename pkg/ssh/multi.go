@@ -33,9 +33,7 @@ func (m *multiNode) Run(sessions []*ssh.Session) error {
 	for _, session := range sessions {
 		if m.command != "" {
 			logger := loggerFactory.NewLogger(m.multiHost[cnt])
-			if err := nonInteractiveShellCalling(session, m.command, logger); err != nil {
-				return err
-			}
+			nonInteractiveShellCalling(session, m.command, logger)
 		} else {
 			return errors.New("please specify the command")
 		}
