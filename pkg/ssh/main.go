@@ -28,6 +28,7 @@ func (s *sshConfig) Set(
 	s.command = command
 }
 
+// Authentication is a function used to create a configuration for authentication.
 func (s *sshConfig) Authentication() ([]*ssh.ClientConfig, error) {
 	var (
 		clientConfig []*ssh.ClientConfig
@@ -52,6 +53,7 @@ func (s *sshConfig) Authentication() ([]*ssh.ClientConfig, error) {
 	return clientConfig, nil
 }
 
+// Connect is a function for creating multiple sessions.
 func (s *sshConfig) Connect(sshConfig []*ssh.ClientConfig) ([]*ssh.Session, error) {
 	var (
 		host = s.host[0]
@@ -68,6 +70,7 @@ func (s *sshConfig) Connect(sshConfig []*ssh.ClientConfig) ([]*ssh.Session, erro
 	return sessions, nil
 }
 
+// Run is a function that sends a command to multiple devices.
 func (s *sshConfig) Run(sessions []*ssh.Session) error {
 	var host = s.host[0]
 	loggerFactory := log.NewLoggerFactory()
