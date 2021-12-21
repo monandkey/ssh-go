@@ -6,6 +6,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// getFileName is a function to get the configuration name.
 func getFileName() string {
 	const configFileName string = ".ssh/ssh_config.yaml"
 	homeDir := setHomedir()
