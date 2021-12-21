@@ -3,21 +3,27 @@ package config
 // ConfigAction is an interface that defines methods for manipulating the configuration.
 type ConfigAction interface {
 	SetParams(string, string, string, string, string)
-	Load()
+	Load() []configParams
 	Write() error
 }
 
 // configParams is a structure that handles the config
 type configParams struct {
-	Params []configDetail `yaml:"params"`
-	Jump   []configDetail `yaml:"jump"`
-}
-
-// configDetail is a structure that manages parameters for configuring
-type configDetail struct {
 	Name     string `yaml:"name"`
 	User     string `yaml:"user"`
 	Host     string `yaml:"host"`
+	Port     string `yaml:"port"`
+	Password string `yaml:"password"`
+	Keypath  string `yaml:"keypath"`
+	Jump     []jump `yaml:"jump"`
+}
+
+// configDetail is a structure that manages parameters for configuring
+type jump struct {
+	Name     string `yaml:"name"`
+	User     string `yaml:"user"`
+	Host     string `yaml:"host"`
+	Port     string `yaml:"port"`
 	Password string `yaml:"password"`
 	Keypath  string `yaml:"keypath"`
 }
