@@ -25,6 +25,12 @@ func Test_getFileName(t *testing.T) {
 }
 
 func Test_configLoad(t *testing.T) {
+	var (
+		cfg     = configExampleLoad()
+		mcfg    = []configParams{cfg[0], cfg[0]}
+		jumpcfg = configExampleLoadJump()
+	)
+
 	type args struct {
 		fileName string
 	}
@@ -34,11 +40,25 @@ func Test_configLoad(t *testing.T) {
 		want []configParams
 	}{
 		{
-			name: "Normal Test",
+			name: "Single node Test",
 			args: args{
 				fileName: "/root/.ssh/ssh_config.yaml",
 			},
-			want: configExampleLoad(),
+			want: cfg,
+		},
+		{
+			name: "Multipul Node Test",
+			args: args{
+				fileName: "/root/.ssh/ssh_config_multi.yaml",
+			},
+			want: mcfg,
+		},
+		{
+			name: "Jump Node Test",
+			args: args{
+				fileName: "/root/.ssh/ssh_config_jump.yaml",
+			},
+			want: jumpcfg,
 		},
 	}
 	for _, tt := range tests {
