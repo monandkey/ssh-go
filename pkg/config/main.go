@@ -3,6 +3,8 @@ This package is for configuration management.
 */
 package config
 
+import "fmt"
+
 // SelectConfigUser is a function that returns an interface.
 func SelectConfigUser() ConfigAction {
 	return &baseParams{}
@@ -35,6 +37,29 @@ func (b *baseParams) Load() []configParams {
 
 // Write is a function for writing the configuration.
 func (b *baseParams) Write() error {
+	var overWriteFlag string
+	fileName := getFileName()
+
+	if fileExist(fileName) {
+		fmt.Print("overwrite ? y or n: ")
+		fmt.Scan(&overWriteFlag)
+
+		if overWriteFlag != "y" {
+			fmt.Println("configurations were not changed")
+			return nil
+		}
+	}
+
+	if err := configWrite(fileName, b.params); err != nil {
+		return err
+	}
+
+	if overWriteFlag == "y" {
+		fmt.Println("Overwrite!!")
+	} else {
+		fmt.Println("Create config file")
+	}
+
 	return nil
 }
 
